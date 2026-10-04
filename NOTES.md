@@ -120,3 +120,9 @@ PORT=4500 z80-lisp    # another TCP port for the emulated console
 
 `test.sh` runs all three in 41 s. cpmsim runs unthrottled at about 450 MHz
 of emulated Z80 clock.
+
+## Conformance file
+
+`r7rs-tests-z80.scm` is the 205-case suite this port was validated against (the shared suite as of
+the merge). The shared suite has since grown cases for number, character and blob features
+that only the STM32 Scheme has; the Z80 harness has no per-case timeout, so it keeps its pinned copy.
