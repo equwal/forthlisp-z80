@@ -1,0 +1,16 @@
+#!/bin/sh
+# z80-lisp -- boot the Z80 Forth, load the Scheme (lisp.fs + prelude.scm) through it, attach its REPL.
+# PORT picks the TCP port of the emulated serial console (default 4455). Quit with ctrl-c.
+set -e
+SRC=$(cd "$(dirname "$0")" && pwd)
+PORT=${PORT:-4455}
+IMG=$SRC/kernel.mos
+[ -x "${Z80PACK:-$HOME/src/z80pack}/cpmsim/cpmsim" ] || "$SRC/build-emu.sh" >&2
+[ "$IMG" -nt "$SRC/kernel.lisp" ] && [ "$IMG" -nt "$SRC/asm.lisp" ] || "${SBCL:-sbcl}" --script "$SRC/kernel.lisp" "$IMG" >/dev/null
+EPID=$(PORT=$PORT "$SRC/emu.sh" "$IMG")
+trap 'kill $EPID 2>/dev/null; ${STTY:-stty} sane 2>/dev/null' EXIT HUP INT TERM
+sleep 0.5   # let cpmsim open its listening socket
+PORT=$PORT "${SBCL:-sbcl}" --script "$SRC/host.lisp" load
+printf 'Z80 Scheme ready: type an expression, (forth) returns to Forth, ctrl-c quits\n> '
+${STTY:-stty} -echo -icanon 2>/dev/null || true   # the kernel echoes; no tty when piped
+${NC:-nc} 127.0.0.1 $PORT

@@ -1,0 +1,14 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  layers:
+    # Builds z80pack (cpmsim + z80asm) from source, then runs all three test layers.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: forthlisp-z80 }
+      - uses: actions/checkout@v4
+        with: { repository: equwal/forthlisp, path: forthlisp }
+      - run: sudo apt-get update && sudo apt-get install -y sbcl build-essential
+      - run: cd forthlisp-z80 && sh build-emu.sh
+      - run: cd forthlisp-z80 && sh test.sh
