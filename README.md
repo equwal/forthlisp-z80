@@ -53,3 +53,9 @@ stack depth.
 
 MIT (see `LICENSE`). z80pack is not part of this repo; `build-emu.sh` downloads it under
 its own MIT licence.
+
+## CI
+
+`ci-local.sh` (in the forthlisp core repo) runs every test layer of all three repos in a
+clean `ubuntu:24.04` container. It runs after each publish, without a hosted CI service.
+The last result is on https://dickt.store/forthlisp/.
